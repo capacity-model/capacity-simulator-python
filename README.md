@@ -1,25 +1,38 @@
-# ISyE 6202 · 6335 · Capacity Modeling
+# :truck: Stochastic Capacity Simulator
 
-**Stochastic Capacity Simulator — Python (Streamlit) version**
+An interactive Monte-Carlo simulator for capacity modeling under stochastic demand, reliability, quality, and efficiency. Developed for **ISyE 6202 & 6335 — Supply Chain Facilities** at the Georgia Institute of Technology (Instructor: Prof. Benoit Montreuil). This is the Python (Streamlit) version; an interactive web version is also available.
 
-An interactive Monte-Carlo capacity-modeling simulator.
-
-- **Course:** ISyE 6202 & 6335 — Supply Chain Facilities
-- **Instructor:** Prof. Benoit Montreuil
-
-This is the **Python version** of the simulator, so students can read and modify
-the model directly. It shares the same model as the web (HTML) version.
-
-- **Web (HTML) app:** https://capacity-model.github.io/
 - **Live Python app:** https://capacity-model.streamlit.app/
-- **This repository:** the [Streamlit](https://streamlit.io) source (`app.py`).
+- **Web (HTML) app:** https://capacity-model.github.io/
 
-## What it models
+## Installation
 
-Each day, production runs on `N` resources with process time `t` and availability
-`a` minutes/day, `k` working days per week. Demand is random (Normal / Triangular /
-PERT / Beta). Reliability, Quality and Efficiency are each Beta-distributed on
-[0, 1] with a student-set mean and σ.
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/capacity-model/capacity-simulator-python.git
+   cd capacity-simulator-python
+   ```
+
+2. Install the required packages:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Usage
+
+Launch the app locally:
+
+```bash
+streamlit run app.py
+```
+
+Then open the URL Streamlit prints (usually http://localhost:8501). Set the parameters in the sidebar and roll new simulated instances.
+
+### Model
+
+Each day, production runs on `N` resources with process time `t` and availability `a` minutes/day, over `k` working days per week. Demand is drawn from a chosen distribution (Normal / Triangular / PERT / Beta); reliability, quality, and efficiency are each Beta-distributed on [0, 1].
 
 ```
 Net capacity = work × ⌊ a·N·(R·Q·E) ÷ t ⌋
@@ -29,17 +42,16 @@ Lost sales   = max( 0, Demand − Sales )
 Final stock  = max( 0, Init + Production − Sales )
 ```
 
-## Run locally
+### Source Code
 
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Then open the URL Streamlit prints (usually http://localhost:8501).
-
-## Files
-
-- `app.py` — the whole app (model + UI).
+- `app.py` — the full application (sampling, simulation, and UI).
 - `requirements.txt` — Python dependencies.
 - `.streamlit/config.toml` — Georgia Tech theme colors.
+
+## Contact
+
+For questions or suggestions, please [raise an issue](https://github.com/capacity-model/capacity-simulator-python/issues) or [contact us](mailto:yquan9@gatech.edu).
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
