@@ -350,8 +350,15 @@ led = pd.DataFrame(
 )
 st.dataframe(led, use_container_width=True, height=440, hide_index=True)
 
-st.caption("Capacity Modeling · ISyE 6202 & 6335 Supply Chain Facilities · Georgia Tech ISyE")
-st.caption(
-    "Simulator developed by PhD student Yinzhu Quan and Prof. Benoit Montreuil "
-    "· Version 1.0, 2026-09-10"
+st.markdown(
+    """
+    <div style="margin-top:26px;padding-top:16px;border-top:1px solid #e3e7ea;
+        color:#808495;font-size:12px;display:flex;justify-content:space-between;
+        gap:6px 12px;flex-wrap:wrap">
+      <span>Capacity Modeling · ISyE 6202 &amp; 6335 Supply Chain Facilities</span>
+      <span>Simulator developed by PhD student Yinzhu Quan and Prof. Benoit Montreuil</span>
+      <span style="flex-basis:100%;text-align:right">Version 1.0, 2026-09-10</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
