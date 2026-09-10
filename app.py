@@ -9,6 +9,7 @@ https://capacity-model.github.io/
 Run locally:   pip install -r requirements.txt   then   streamlit run app.py
 """
 
+import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -217,24 +218,49 @@ d1.metric("Gross capacity", f"{gross:,.0f}", help="units/day")
 d2.metric("r·q·e", f"{eqr*100:.0f}%", help="mean factor")
 d3.metric("Est. net capacity", f"{eqr*gross:,.0f}", help="units/day")
 
-# Charts (native Streamlit line charts — light and dependency-free)
+
+# Charts (Altair — click a legend name to hide/show its line; drag to zoom)
+def line_chart(data, key_names, colors, height, pct=False):
+    long = data.melt(id_vars="day", value_vars=list(key_names), var_name="k", value_name="value")
+    long["Series"] = long["k"].map(key_names)
+    if pct:
+        long["value"] = long["value"] * 100
+    names = list(key_names.values())
+    sel = alt.selection_point(fields=["Series"], bind="legend")
+    return (
+        alt.Chart(long)
+        .mark_line()
+        .encode(
+            x=alt.X("day:Q", title="Day"),
+            y=alt.Y("value:Q", title="%" if pct else None),
+            color=alt.Color(
+                "Series:N", title=None, sort=names, scale=alt.Scale(domain=names, range=colors)
+            ),
+            opacity=alt.condition(sel, alt.value(1.0), alt.value(0.12)),
+            tooltip=["day", "Series", alt.Tooltip("value:Q", format=".0f")],
+        )
+        .add_params(sel)
+        .properties(height=height)
+        .interactive()
+    )
+
+
 st.subheader("Daily quantities under current scenario instance")
-chart1 = df.set_index("day")[["init", "demand", "netcap", "prod", "sales", "lost", "final"]]
-chart1.columns = [
-    "Initial stock",
-    "Demand",
-    "Net capacity",
-    "Production",
-    "Sales",
-    "Lost sales",
-    "Final stock",
-]
-st.line_chart(chart1, color=SERIES1_COLORS, height=360)
+names1 = {
+    "init": "Initial stock",
+    "demand": "Demand",
+    "netcap": "Net capacity",
+    "prod": "Production",
+    "sales": "Sales",
+    "lost": "Lost sales",
+    "final": "Final stock",
+}
+st.altair_chart(line_chart(df, names1, SERIES1_COLORS, 360), use_container_width=True)
 
 st.subheader("Dynamic service & capacity utilization performance")
-chart2 = df.set_index("day")[["svc", "gu", "nu"]] * 100
-chart2.columns = ["Service level", "Gross cap utilization", "Net cap utilization"]
-st.line_chart(chart2, color=[SERIES1_COLORS[0], SERIES1_COLORS[1], SERIES1_COLORS[5]], height=320)
+names2 = {"svc": "Service level", "gu": "Gross cap utilization", "nu": "Net cap utilization"}
+c2_colors = [SERIES1_COLORS[0], SERIES1_COLORS[1], SERIES1_COLORS[5]]
+st.altair_chart(line_chart(df, names2, c2_colors, 320, pct=True), use_container_width=True)
 
 # Summary statistics
 st.subheader("Summary statistics")
