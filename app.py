@@ -202,13 +202,13 @@ st.caption(
 )
 
 # KPIs
-k1, k2, k3, k4 = st.columns(4)
+k1, k2, k3, k4 = st.columns(4, border=True)
 k1.metric("Mean service level", f"{df['svc'].mean()*100:.1f}%")
 k2.metric("Total demand", f"{df['demand'].sum():,.0f}", help="units over horizon")
 k3.metric("Stockout days", f"{int((df['lost'] > 0.5).sum())}", help=f"of {len(df)} days")
 k4.metric("Total lost sales", f"{df['lost'].sum():,.0f}", help="units over horizon")
 
-d1, d2, d3 = st.columns(3)
+d1, d2, d3 = st.columns(3, border=True)
 d1.metric("Gross capacity", f"{gross:,.0f}", help="units/day")
 d2.metric("r·q·e", f"{eqr*100:.0f}%", help="mean factor")
 d3.metric("Est. net capacity", f"{eqr*gross:,.0f}", help="units/day")
