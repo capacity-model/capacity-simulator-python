@@ -3,8 +3,7 @@
 Interactive Monte-Carlo capacity-modeling simulator for **ISyE 6202 & 6335
 Supply Chain Facilities** (Georgia Tech). This is the **Python version** of the
 model — students can read and modify the code. The formulas are identical to the
-web (HTML/JavaScript) version and were validated to match the professor's Excel
-Sheet 2 exactly (300 days, 0 error).
+web (HTML/JavaScript) version.
 
 - **Web (HTML) version:** https://capacity-model.github.io/
 - **This Python version:** a [Streamlit](https://streamlit.io) app (`app.py`).

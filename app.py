@@ -3,8 +3,8 @@ Stochastic Capacity Simulator — Streamlit (Python) version
 ISyE 6202 & 6335 Supply Chain Facilities · Georgia Tech
 
 A Monte-Carlo model of daily production under stochastic demand, reliability,
-quality and efficiency. Same model as the web (HTML) version and validated
-to match the professor's Excel Sheet 2 exactly.
+quality and efficiency. Same model as the web (HTML) version:
+https://capacity-model.github.io/
 
 Run locally:   pip install -r requirements.txt   then   streamlit run app.py
 """
@@ -71,7 +71,7 @@ def draw_demand(rng, p):
 
 
 # ----------------------------------------------------------------------------
-# Simulation (identical formulas to the web version / Excel Sheet 2)
+# Simulation
 # ----------------------------------------------------------------------------
 def simulate(p, rng):
     gross = p["N"] * p["a"] / p["t"]
