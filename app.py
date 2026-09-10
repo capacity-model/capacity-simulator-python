@@ -240,7 +240,11 @@ def line_chart(data, key_names, colors, height, shown, pct=False):
     wide = wide.rename(columns={k: key_names[k] for k in shown_keys})
 
     color = alt.Color(
-        "Series:N", title=None, sort=names, scale=alt.Scale(domain=names, range=colors)
+        "Series:N",
+        title=None,
+        sort=names,
+        scale=alt.Scale(domain=names, range=colors),
+        legend=alt.Legend(symbolSize=70, symbolType="circle"),
     )
     nearest = alt.selection_point(nearest=True, on="pointerover", fields=["day"], empty=False)
 
