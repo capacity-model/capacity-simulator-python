@@ -314,18 +314,26 @@ cols = [
     ("Lost Sales", "lost"),
     ("Final Stock", "final"),
     ("Service Level", "svc"),
-    ("Gross Capacity Utilization", "gu"),
-    ("Net Capacity Utilization", "nu"),
+    ("Gross Cap. Util.", "gu"),
+    ("Net Cap. Util.", "nu"),
 ]
 pct_keys = {"R", "Q", "E", "netcapPct", "svc", "gu", "nu"}
+# Keep values numeric so all data columns right-align; the Min/Mean/Max row
+# labels stay on the left. Percentage columns get a "%" via column_config.
 stats = {}
 for label, key in cols:
     s = disp[key]
     if key in pct_keys:
-        stats[label] = [f"{s.min()*100:.0f}%", f"{s.mean()*100:.0f}%", f"{s.max()*100:.0f}%"]
+        stats[label] = [round(s.min() * 100), round(s.mean() * 100), round(s.max() * 100)]
     else:
-        stats[label] = [f"{s.min():,.0f}", f"{s.mean():,.0f}", f"{s.max():,.0f}"]
-st.dataframe(pd.DataFrame(stats, index=["Min", "Mean", "Max"]), use_container_width=True)
+        stats[label] = [round(s.min()), round(s.mean()), round(s.max())]
+stat_df = pd.DataFrame(stats, index=["Min", "Mean", "Max"])
+stat_pct = st.column_config.NumberColumn(format="%d%%")
+st.dataframe(
+    stat_df,
+    use_container_width=True,
+    column_config={label: stat_pct for label, key in cols if key in pct_keys},
+)
 
 # Daily ledger
 st.subheader("Daily ledger")
