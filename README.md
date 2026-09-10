@@ -1,12 +1,18 @@
 # Stochastic Capacity Simulator — Python (Streamlit)
 
-Interactive Monte-Carlo capacity-modeling simulator for **ISyE 6202 & 6335
-Supply Chain Facilities** (Georgia Tech). This is the **Python version** of the
-model — students can read and modify the code. The formulas are identical to the
-web (HTML/JavaScript) version.
+An interactive Monte-Carlo capacity-modeling simulator for
+**ISyE 6202 / 6335 — Supply Chain Facilities**, Georgia Institute of Technology.
 
-- **Web (HTML) version:** https://capacity-model.github.io/
-- **This Python version:** a [Streamlit](https://streamlit.io) app (`app.py`).
+- **Course:** ISyE 6202 & 6335 — Supply Chain Facilities
+- **Instructor:** Prof. Benoit Montreuil
+- **Institution:** Georgia Institute of Technology, H. Milton Stewart School of Industrial & Systems Engineering (ISyE)
+
+This is the **Python version** of the simulator, so students can read and modify
+the model directly. It shares the same model as the web (HTML) version.
+
+- **Web (HTML) app:** https://capacity-model.github.io/
+- **Live Python app:** https://capacity-model.streamlit.app/
+- **This repository:** the [Streamlit](https://streamlit.io) source (`app.py`).
 
 ## What it models
 
