@@ -335,20 +335,36 @@ led = pd.DataFrame(
         "Off": np.where(df["work"] == 0, "off", ""),
         "Initial Stock": df["init"].round(0).astype(int),
         "Demand": df["demand"].round(0).astype(int),
-        "Reliability": (df["R"] * 100).round(0).astype(int).astype(str) + "%",
-        "Quality": (df["Q"] * 100).round(0).astype(int).astype(str) + "%",
-        "Efficiency": (df["E"] * 100).round(0).astype(int).astype(str) + "%",
+        "Reliability": (df["R"] * 100).round(0).astype(int),
+        "Quality": (df["Q"] * 100).round(0).astype(int),
+        "Efficiency": (df["E"] * 100).round(0).astype(int),
         "Net Capacity": df["netcap"].round(0).astype(int),
         "Production": df["prod"].round(0).astype(int),
         "Sales": df["sales"].round(0).astype(int),
         "Lost Sales": df["lost"].round(0).astype(int),
         "Final Stock": df["final"].round(0).astype(int),
-        "Service Level": (df["svc"] * 100).round(0).astype(int).astype(str) + "%",
-        "Gross Capacity Utilization": (df["gu"] * 100).round(0).astype(int).astype(str) + "%",
-        "Net Capacity Utilization": (df["nu"] * 100).round(0).astype(int).astype(str) + "%",
+        "Service Level": (df["svc"] * 100).round(0).astype(int),
+        "Gross Capacity Utilization": (df["gu"] * 100).round(0).astype(int),
+        "Net Capacity Utilization": (df["nu"] * 100).round(0).astype(int),
     }
 )
-st.dataframe(led, use_container_width=True, height=440, hide_index=True)
+# All data columns are numeric so the grid right-aligns them consistently;
+# percentage columns are rendered with a trailing "%" via column_config.
+pct = st.column_config.NumberColumn(format="%d%%")
+st.dataframe(
+    led,
+    use_container_width=True,
+    height=440,
+    hide_index=True,
+    column_config={
+        "Reliability": pct,
+        "Quality": pct,
+        "Efficiency": pct,
+        "Service Level": pct,
+        "Gross Capacity Utilization": pct,
+        "Net Capacity Utilization": pct,
+    },
+)
 
 st.markdown(
     """
