@@ -48,6 +48,6 @@ Final stock  = max( 0, Init + Production − Sales )
 - `requirements.txt` — Python dependencies.
 - `.streamlit/config.toml` — Georgia Tech theme colors.
 
-## Contact
+## Contact Us
 
-For questions or suggestions, please [raise an issue](https://github.com/capacity-model/capacity-simulator-python/issues) or [contact us](mailto:yquan9@gatech.edu).
+For any questions about this interactive simulator, please contact Yinzhu Quan ([yquan9@gatech.edu](mailto:yquan9@gatech.edu)).
