@@ -81,7 +81,7 @@ def simulate(p, rng):
     init = p["target"]  # day 1 opens at the target inventory
     rows = []
     for day in range(1, p["days"] + 1):
-        work = 1 if (day - 1) % 7 < p["k"] else 0  # working day? 1/0 (first k of each week)
+        work = 1 if (day - 1) % 7 < p["k"] else 0  # working day 1/0 (first k of each week)
         demand = draw_demand(rng, p)  # demand
         R = sample_beta_scaled(rng, 0, 1, p["rMean"], p["sAvail"])  # reliability (0-1)
         Q = sample_beta_scaled(rng, 0, 1, p["qMean"], p["sQual"])  # quality (0-1)
