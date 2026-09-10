@@ -344,8 +344,8 @@ led = pd.DataFrame(
         "Lost Sales": df["lost"].round(0).astype(int),
         "Final Stock": df["final"].round(0).astype(int),
         "Service Level": (df["svc"] * 100).round(0).astype(int),
-        "Gross Capacity Utilization": (df["gu"] * 100).round(0).astype(int),
-        "Net Capacity Utilization": (df["nu"] * 100).round(0).astype(int),
+        "Gross Cap. Util.": (df["gu"] * 100).round(0).astype(int),
+        "Net Cap. Util.": (df["nu"] * 100).round(0).astype(int),
     }
 )
 # All data columns are numeric so the grid right-aligns them consistently;
@@ -361,8 +361,8 @@ st.dataframe(
         "Quality": pct,
         "Efficiency": pct,
         "Service Level": pct,
-        "Gross Capacity Utilization": pct,
-        "Net Capacity Utilization": pct,
+        "Gross Cap. Util.": pct,
+        "Net Cap. Util.": pct,
     },
 )
 
