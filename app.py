@@ -331,7 +331,7 @@ st.dataframe(pd.DataFrame(stats, index=["Min", "Mean", "Max"]), use_container_wi
 st.subheader("Daily ledger")
 led = pd.DataFrame(
     {
-        "Day": df["day"],
+        "Day": df["day"].astype(str),  # text so Day left-aligns (Off is text too)
         "Off": np.where(df["work"] == 0, "off", ""),
         "Initial Stock": df["init"].round(0).astype(int),
         "Demand": df["demand"].round(0).astype(int),
