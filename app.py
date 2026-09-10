@@ -226,7 +226,8 @@ def line_chart(data, key_names, colors, height, pct=False):
     if pct:
         long["value"] = long["value"] * 100
     names = list(key_names.values())
-    sel = alt.selection_point(fields=["Series"], bind="legend")
+    # click a legend name to hide that line (toggle); others stay — like the HTML version
+    sel = alt.selection_point(fields=["Series"], bind="legend", toggle=True, empty=False)
     return (
         alt.Chart(long)
         .mark_line()
@@ -236,7 +237,7 @@ def line_chart(data, key_names, colors, height, pct=False):
             color=alt.Color(
                 "Series:N", title=None, sort=names, scale=alt.Scale(domain=names, range=colors)
             ),
-            opacity=alt.condition(sel, alt.value(1.0), alt.value(0.12)),
+            opacity=alt.condition(sel, alt.value(0.0), alt.value(1.0)),
             tooltip=["day", "Series", alt.Tooltip("value:Q", format=".0f")],
         )
         .add_params(sel)
