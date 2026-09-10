@@ -14,11 +14,11 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="Stochastic Capacity Simulator",
-                   page_icon="🚚", layout="wide")
+st.set_page_config(page_title="Stochastic Capacity Simulator", page_icon="🚚", layout="wide")
 
 # Georgia Tech look-and-feel
-st.markdown("""
+st.markdown(
+    """
 <style>
   .block-container {padding-top: 2.2rem; max-width: 1300px;}
   h1 {color: #003057; letter-spacing: -.01em;}
@@ -31,11 +31,14 @@ st.markdown("""
       border: none;}
   .stButton>button:hover {filter: brightness(1.05); color: #241f07;}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Georgia Tech palette
 GOLD, NAVY = "#b3a369", "#003057"
 SERIES1_COLORS = ["#3b82c4", "#d24b57", "#e0982a", "#157a8a", "#9c4f2f", "#4f9d54", "#7a5cc0"]
+
 
 # ----------------------------------------------------------------------------
 # Random sampling (mirrors the JS engine)
@@ -74,26 +77,43 @@ def draw_demand(rng, p):
 # Simulation
 # ----------------------------------------------------------------------------
 def simulate(p, rng):
-    gross = p["N"] * p["a"] / p["t"]
-    rows, init = [], p["target"]
+    gross = p["N"] * p["a"] / p["t"]  # gross capacity = N*a/t (units/day)
+    init = p["target"]  # day 1 opens at the target inventory
+    rows = []
     for day in range(1, p["days"] + 1):
-        work = 1 if (day - 1) % 7 < p["k"] else 0
-        demand = draw_demand(rng, p)
-        R = sample_beta_scaled(rng, 0, 1, p["rMean"], p["sAvail"])
-        Q = sample_beta_scaled(rng, 0, 1, p["qMean"], p["sQual"])
-        E = sample_beta_scaled(rng, 0, 1, p["eMean"], p["sEff"])
-        netcap = work * np.floor(p["a"] * p["N"] * R * Q * E / p["t"])
-        prod = min(netcap, demand + max(0.0, p["target"] - init))
-        sales = max(0.0, min(demand, prod + init))
-        lost = max(0.0, demand - sales)
-        final = max(0.0, init + prod - sales)
-        svc = sales / demand if demand > 0 else 1.0
-        gu = prod / gross
-        nu = prod / netcap if (work == 1 and netcap > 0) else 0.0
-        rows.append(dict(day=day, work=work, init=init, demand=demand,
-                         R=R, Q=Q, E=E, netcap=netcap, prod=prod, sales=sales,
-                         lost=lost, final=final, svc=svc, gu=gu, nu=nu))
-        init = final
+        work = 1 if (day - 1) % 7 < p["k"] else 0  # working day? 1/0 (first k of each week)
+        demand = draw_demand(rng, p)  # demand
+        R = sample_beta_scaled(rng, 0, 1, p["rMean"], p["sAvail"])  # reliability (0-1)
+        Q = sample_beta_scaled(rng, 0, 1, p["qMean"], p["sQual"])  # quality (0-1)
+        E = sample_beta_scaled(rng, 0, 1, p["eMean"], p["sEff"])  # efficiency (0-1)
+        netcap = work * np.floor(p["a"] * p["N"] * R * Q * E / p["t"])  # net capacity
+        prod = min(netcap, demand + max(0.0, p["target"] - init))  # production
+        sales = max(0.0, min(demand, prod + init))  # sales
+        lost = max(0.0, demand - sales)  # lost sales
+        final = max(0.0, init + prod - sales)  # final stock
+        svc = sales / demand if demand > 0 else 1.0  # service level
+        gu = prod / gross  # gross utilization
+        nu = prod / netcap if (work == 1 and netcap > 0) else 0.0  # net utilization
+        rows.append(
+            dict(
+                day=day,
+                work=work,
+                init=init,
+                demand=demand,
+                R=R,
+                Q=Q,
+                E=E,
+                netcap=netcap,
+                prod=prod,
+                sales=sales,
+                lost=lost,
+                final=final,
+                svc=svc,
+                gu=gu,
+                nu=nu,
+            )
+        )
+        init = final  # carry today's closing stock to tomorrow's opening stock
     return pd.DataFrame(rows), gross
 
 
@@ -117,10 +137,28 @@ days = st.sidebar.number_input("Simulation days", 7, 2000, 300, 1)
 
 st.sidebar.subheader("Demand distribution")
 dem = st.sidebar.selectbox("Distribution", ["Normal", "Triangular", "PERT", "Beta"])
-p = dict(N=N, t=t, a=a, k=int(k), target=target, days=int(days), dem=dem,
-         dMean=429.0, dStd=38.0, tMin=300.0, tMode=429.0, tMax=560.0,
-         pMin=300.0, pMode=429.0, pMax=560.0, pLam=4.0,
-         bMin=300.0, bMax=560.0, bMean=429.0, bStd=40.0)
+p = dict(
+    N=N,
+    t=t,
+    a=a,
+    k=int(k),
+    target=target,
+    days=int(days),
+    dem=dem,
+    dMean=429.0,
+    dStd=38.0,
+    tMin=300.0,
+    tMode=429.0,
+    tMax=560.0,
+    pMin=300.0,
+    pMode=429.0,
+    pMax=560.0,
+    pLam=4.0,
+    bMin=300.0,
+    bMax=560.0,
+    bMean=429.0,
+    bStd=40.0,
+)
 if dem == "Normal":
     p["dMean"] = st.sidebar.number_input("Mean (units/day)", value=429.0)
     p["dStd"] = st.sidebar.number_input("Std dev (units/day)", 0.0, value=38.0)
@@ -158,9 +196,11 @@ eqr = p["rMean"] * p["qMean"] * p["eMean"]
 
 st.markdown("#### ISyE 6202 · 6335 Supply Chain Facilities · Capacity Modeling")
 st.title("🚚 Stochastic Capacity Simulator")
-st.caption("A Monte-Carlo model of daily production under stochastic demand, "
-           "reliability, quality and efficiency. Adjust the parameters in the sidebar, "
-           "then roll a new simulated instance.")
+st.caption(
+    "A Monte-Carlo model of daily production under stochastic demand, "
+    "reliability, quality and efficiency. Adjust the parameters in the sidebar, "
+    "then roll a new simulated instance."
+)
 
 # KPIs
 k1, k2, k3, k4 = st.columns(4)
@@ -178,36 +218,64 @@ d3.metric("Est. net capacity", f"{eqr*gross:,.0f}", help="units/day")
 st.subheader("Daily quantities under current scenario instance")
 fig1 = go.Figure()
 for (key, name), col in zip(
-        [("init", "Initial stock"), ("demand", "Demand"), ("netcap", "Net capacity"),
-         ("prod", "Production"), ("sales", "Sales"), ("lost", "Lost sales"),
-         ("final", "Final stock")], SERIES1_COLORS):
-    fig1.add_trace(go.Scatter(x=df["day"], y=df[key], name=name,
-                              line=dict(color=col, width=1.3)))
-fig1.update_layout(height=340, margin=dict(l=10, r=10, t=10, b=10),
-                   legend=dict(orientation="h"), hovermode="x unified")
+    [
+        ("init", "Initial stock"),
+        ("demand", "Demand"),
+        ("netcap", "Net capacity"),
+        ("prod", "Production"),
+        ("sales", "Sales"),
+        ("lost", "Lost sales"),
+        ("final", "Final stock"),
+    ],
+    SERIES1_COLORS,
+):
+    fig1.add_trace(go.Scatter(x=df["day"], y=df[key], name=name, line=dict(color=col, width=1.3)))
+fig1.update_layout(
+    height=340,
+    margin=dict(l=10, r=10, t=10, b=10),
+    legend=dict(orientation="h"),
+    hovermode="x unified",
+)
 st.plotly_chart(fig1, use_container_width=True)
 
 st.subheader("Dynamic service & capacity utilization performance")
 fig2 = go.Figure()
-for key, name, col in [("svc", "Service level", SERIES1_COLORS[0]),
-                       ("gu", "Gross cap utilization", SERIES1_COLORS[1]),
-                       ("nu", "Net cap utilization", SERIES1_COLORS[5])]:
-    fig2.add_trace(go.Scatter(x=df["day"], y=df[key]*100, name=name,
-                              line=dict(color=col, width=1.3)))
-fig2.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10),
-                   yaxis=dict(ticksuffix="%"), legend=dict(orientation="h"),
-                   hovermode="x unified")
+for key, name, col in [
+    ("svc", "Service level", SERIES1_COLORS[0]),
+    ("gu", "Gross cap utilization", SERIES1_COLORS[1]),
+    ("nu", "Net cap utilization", SERIES1_COLORS[5]),
+]:
+    fig2.add_trace(
+        go.Scatter(x=df["day"], y=df[key] * 100, name=name, line=dict(color=col, width=1.3))
+    )
+fig2.update_layout(
+    height=300,
+    margin=dict(l=10, r=10, t=10, b=10),
+    yaxis=dict(ticksuffix="%"),
+    legend=dict(orientation="h"),
+    hovermode="x unified",
+)
 st.plotly_chart(fig2, use_container_width=True)
 
 # Summary statistics
 st.subheader("Summary statistics")
 disp = df.copy()
 disp["netcapPct"] = disp["netcap"] / gross
-cols = [("Initial Stock", "init"), ("Demand", "demand"), ("Reliability", "R"),
-        ("Quality", "Q"), ("Efficiency", "E"), ("Net Capacity (% of gross)", "netcapPct"),
-        ("Production", "prod"), ("Sales", "sales"), ("Lost Sales", "lost"),
-        ("Final Stock", "final"), ("Service Level", "svc"),
-        ("Gross Capacity Utilization", "gu"), ("Net Capacity Utilization", "nu")]
+cols = [
+    ("Initial Stock", "init"),
+    ("Demand", "demand"),
+    ("Reliability", "R"),
+    ("Quality", "Q"),
+    ("Efficiency", "E"),
+    ("Net Capacity (% of gross)", "netcapPct"),
+    ("Production", "prod"),
+    ("Sales", "sales"),
+    ("Lost Sales", "lost"),
+    ("Final Stock", "final"),
+    ("Service Level", "svc"),
+    ("Gross Capacity Utilization", "gu"),
+    ("Net Capacity Utilization", "nu"),
+]
 pct_keys = {"R", "Q", "E", "netcapPct", "svc", "gu", "nu"}
 stats = {}
 for label, key in cols:
@@ -220,23 +288,25 @@ st.dataframe(pd.DataFrame(stats, index=["Min", "Mean", "Max"]), use_container_wi
 
 # Daily ledger
 st.subheader("Daily ledger")
-led = pd.DataFrame({
-    "Day": df["day"],
-    "Off": np.where(df["work"] == 0, "off", ""),
-    "Initial Stock": df["init"].round(0).astype(int),
-    "Demand": df["demand"].round(0).astype(int),
-    "Reliability": (df["R"]*100).round(0).astype(int).astype(str) + "%",
-    "Quality": (df["Q"]*100).round(0).astype(int).astype(str) + "%",
-    "Efficiency": (df["E"]*100).round(0).astype(int).astype(str) + "%",
-    "Net Capacity": df["netcap"].round(0).astype(int),
-    "Production": df["prod"].round(0).astype(int),
-    "Sales": df["sales"].round(0).astype(int),
-    "Lost Sales": df["lost"].round(0).astype(int),
-    "Final Stock": df["final"].round(0).astype(int),
-    "Service Level": (df["svc"]*100).round(0).astype(int).astype(str) + "%",
-    "Gross Capacity Utilization": (df["gu"]*100).round(0).astype(int).astype(str) + "%",
-    "Net Capacity Utilization": (df["nu"]*100).round(0).astype(int).astype(str) + "%",
-})
+led = pd.DataFrame(
+    {
+        "Day": df["day"],
+        "Off": np.where(df["work"] == 0, "off", ""),
+        "Initial Stock": df["init"].round(0).astype(int),
+        "Demand": df["demand"].round(0).astype(int),
+        "Reliability": (df["R"] * 100).round(0).astype(int).astype(str) + "%",
+        "Quality": (df["Q"] * 100).round(0).astype(int).astype(str) + "%",
+        "Efficiency": (df["E"] * 100).round(0).astype(int).astype(str) + "%",
+        "Net Capacity": df["netcap"].round(0).astype(int),
+        "Production": df["prod"].round(0).astype(int),
+        "Sales": df["sales"].round(0).astype(int),
+        "Lost Sales": df["lost"].round(0).astype(int),
+        "Final Stock": df["final"].round(0).astype(int),
+        "Service Level": (df["svc"] * 100).round(0).astype(int).astype(str) + "%",
+        "Gross Capacity Utilization": (df["gu"] * 100).round(0).astype(int).astype(str) + "%",
+        "Net Capacity Utilization": (df["nu"] * 100).round(0).astype(int).astype(str) + "%",
+    }
+)
 st.dataframe(led, use_container_width=True, height=440, hide_index=True)
 
 st.caption("Capacity Modeling · ISyE 6202 & 6335 Supply Chain Facilities · Georgia Tech ISyE")
