@@ -228,20 +228,29 @@ def line_chart(data, key_names, colors, height, shown, pct=False):
         long["value"] = long["value"] * 100
     names = list(key_names.values())
     long = long[long["Series"].isin(shown)]
-    return (
-        alt.Chart(long)
-        .mark_line()
-        .encode(
-            x=alt.X("day:Q", title="Day"),
-            y=alt.Y("value:Q", title="%" if pct else None),
-            color=alt.Color(
-                "Series:N", title=None, sort=names, scale=alt.Scale(domain=names, range=colors)
-            ),
-            tooltip=["day", "Series", alt.Tooltip("value:Q", format=".0f")],
-        )
-        .properties(height=height)
-        .interactive()
+
+    color = alt.Color(
+        "Series:N", title=None, sort=names, scale=alt.Scale(domain=names, range=colors)
     )
+    nearest = alt.selection_point(nearest=True, on="pointerover", fields=["day"], empty=False)
+    base = alt.Chart(long).encode(x=alt.X("day:Q", title="Day"))
+
+    lines = base.mark_line().encode(y=alt.Y("value:Q", title="%" if pct else None), color=color)
+    # transparent points across the plot to capture the nearest day under the cursor
+    selectors = base.mark_point().encode(opacity=alt.value(0)).add_params(nearest)
+    # dots + value labels that appear on each line at the hovered day
+    dots = lines.mark_point(size=55, filled=True).encode(
+        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+    )
+    labels = lines.mark_text(align="left", dx=6, dy=-6).encode(
+        text=alt.condition(nearest, alt.Tooltip("value:Q", format=".0f"), alt.value(""))
+    )
+    rule = (
+        base.transform_filter(nearest)
+        .mark_rule(color="#9aa5b1")
+        .encode(x="day:Q", tooltip=[alt.Tooltip("day:Q", title="Day")])
+    )
+    return alt.layer(lines, selectors, dots, labels, rule).properties(height=height).interactive()
 
 
 names1 = {
