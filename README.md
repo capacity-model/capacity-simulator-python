@@ -51,7 +51,3 @@ Final stock  = max( 0, Init + Production − Sales )
 ## Contact
 
 For questions or suggestions, please [raise an issue](https://github.com/capacity-model/capacity-simulator-python/issues) or [contact us](mailto:yquan9@gatech.edu).
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
