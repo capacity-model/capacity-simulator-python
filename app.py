@@ -219,15 +219,15 @@ d2.metric("r·q·e", f"{eqr*100:.0f}%", help="mean factor")
 d3.metric("Est. net capacity", f"{eqr*gross:,.0f}", help="units/day")
 
 
-# Charts (Altair — click a legend name to hide/show its line; drag to zoom)
-def line_chart(data, key_names, colors, height, pct=False):
+# Charts. A "Show lines" picker above each chart controls which series are drawn —
+# remove any lines you don't want (you can remove several); re-add them from the dropdown.
+def line_chart(data, key_names, colors, height, shown, pct=False):
     long = data.melt(id_vars="day", value_vars=list(key_names), var_name="k", value_name="value")
     long["Series"] = long["k"].map(key_names)
     if pct:
         long["value"] = long["value"] * 100
     names = list(key_names.values())
-    # click a legend name to hide that line (toggle); others stay — like the HTML version
-    sel = alt.selection_point(fields=["Series"], bind="legend", toggle=True, empty=False)
+    long = long[long["Series"].isin(shown)]
     return (
         alt.Chart(long)
         .mark_line()
@@ -237,16 +237,13 @@ def line_chart(data, key_names, colors, height, pct=False):
             color=alt.Color(
                 "Series:N", title=None, sort=names, scale=alt.Scale(domain=names, range=colors)
             ),
-            opacity=alt.condition(sel, alt.value(0.0), alt.value(1.0)),
             tooltip=["day", "Series", alt.Tooltip("value:Q", format=".0f")],
         )
-        .add_params(sel)
         .properties(height=height)
         .interactive()
     )
 
 
-st.subheader("Daily quantities under current scenario instance")
 names1 = {
     "init": "Initial stock",
     "demand": "Demand",
@@ -256,12 +253,17 @@ names1 = {
     "lost": "Lost sales",
     "final": "Final stock",
 }
-st.altair_chart(line_chart(df, names1, SERIES1_COLORS, 360), use_container_width=True)
+st.subheader("Daily quantities under current scenario instance")
+opts1 = list(names1.values())
+shown1 = st.multiselect("Show lines", opts1, default=opts1, key="show1")
+st.altair_chart(line_chart(df, names1, SERIES1_COLORS, 360, shown1), use_container_width=True)
 
-st.subheader("Dynamic service & capacity utilization performance")
 names2 = {"svc": "Service level", "gu": "Gross cap utilization", "nu": "Net cap utilization"}
 c2_colors = [SERIES1_COLORS[0], SERIES1_COLORS[1], SERIES1_COLORS[5]]
-st.altair_chart(line_chart(df, names2, c2_colors, 320, pct=True), use_container_width=True)
+st.subheader("Dynamic service & capacity utilization performance")
+opts2 = list(names2.values())
+shown2 = st.multiselect("Show lines", opts2, default=opts2, key="show2")
+st.altair_chart(line_chart(df, names2, c2_colors, 320, shown2, pct=True), use_container_width=True)
 
 # Summary statistics
 st.subheader("Summary statistics")
