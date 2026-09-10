@@ -4,6 +4,7 @@ An interactive Monte-Carlo simulator for capacity modeling under stochastic dema
 
 - **Live Python app:** https://capacity-model.streamlit.app/
 - **Web (HTML) app:** https://capacity-model.github.io/
+- **Web (HTML) source:** https://github.com/capacity-model/capacity-model.github.io
 
 ## Installation
 
