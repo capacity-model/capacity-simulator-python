@@ -351,3 +351,7 @@ led = pd.DataFrame(
 st.dataframe(led, use_container_width=True, height=440, hide_index=True)
 
 st.caption("Capacity Modeling · ISyE 6202 & 6335 Supply Chain Facilities · Georgia Tech ISyE")
+st.caption(
+    "Simulator developed by PhD student Yinzhu Quan and Prof. Benoit Montreuil "
+    "· Version 1.0, 2026-09-10"
+)
