@@ -23,6 +23,10 @@ st.markdown(
   h1 {color: #003057; letter-spacing: -.01em;}
   h2, h3 {color: #003057;}
   [data-testid="stMetricValue"] {color: #003057; font-variant-numeric: tabular-nums;}
+  [data-testid="stMetricLabel"] {color: #5c6a78;}
+  [data-testid="stVerticalBlockBorderWrapper"] {
+      background: #ffffff; border: 1px solid #e3e7ea; border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(16, 35, 58, 0.07); padding: 4px 6px;}
   [data-testid="stSidebar"] {border-right: 1px solid #d8dde2;}
   [data-testid="stSidebar"] h1 {font-size: 1.1rem; color: #5c6a78;
       text-transform: uppercase; letter-spacing: .08em;}
