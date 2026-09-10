@@ -1,12 +1,11 @@
-# ISyE 6202 · 6335 Supply Chain Facilities · Capacity Modeling
+# ISyE 6202 · 6335 · Capacity Modeling
 
 **Stochastic Capacity Simulator — Python (Streamlit) version**
 
-An interactive Monte-Carlo capacity-modeling simulator, Georgia Institute of Technology.
+An interactive Monte-Carlo capacity-modeling simulator.
 
 - **Course:** ISyE 6202 & 6335 — Supply Chain Facilities
 - **Instructor:** Prof. Benoit Montreuil
-- **Institution:** Georgia Institute of Technology, H. Milton Stewart School of Industrial & Systems Engineering (ISyE)
 
 This is the **Python version** of the simulator, so students can read and modify
 the model directly. It shares the same model as the web (HTML) version.

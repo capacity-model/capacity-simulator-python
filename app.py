@@ -12,7 +12,6 @@ Run locally:   pip install -r requirements.txt   then   streamlit run app.py
 import numpy as np
 import pandas as pd
 import streamlit as st
-import plotly.graph_objects as go
 
 st.set_page_config(page_title="Stochastic Capacity Simulator", page_icon="🚚", layout="wide")
 
@@ -214,48 +213,24 @@ d1.metric("Gross capacity", f"{gross:,.0f}", help="units/day")
 d2.metric("r·q·e", f"{eqr*100:.0f}%", help="mean factor")
 d3.metric("Est. net capacity", f"{eqr*gross:,.0f}", help="units/day")
 
-# Charts
+# Charts (native Streamlit line charts — light and dependency-free)
 st.subheader("Daily quantities under current scenario instance")
-fig1 = go.Figure()
-for (key, name), col in zip(
-    [
-        ("init", "Initial stock"),
-        ("demand", "Demand"),
-        ("netcap", "Net capacity"),
-        ("prod", "Production"),
-        ("sales", "Sales"),
-        ("lost", "Lost sales"),
-        ("final", "Final stock"),
-    ],
-    SERIES1_COLORS,
-):
-    fig1.add_trace(go.Scatter(x=df["day"], y=df[key], name=name, line=dict(color=col, width=1.3)))
-fig1.update_layout(
-    height=340,
-    margin=dict(l=10, r=10, t=10, b=10),
-    legend=dict(orientation="h"),
-    hovermode="x unified",
-)
-st.plotly_chart(fig1, use_container_width=True)
+chart1 = df.set_index("day")[["init", "demand", "netcap", "prod", "sales", "lost", "final"]]
+chart1.columns = [
+    "Initial stock",
+    "Demand",
+    "Net capacity",
+    "Production",
+    "Sales",
+    "Lost sales",
+    "Final stock",
+]
+st.line_chart(chart1, color=SERIES1_COLORS, height=360)
 
 st.subheader("Dynamic service & capacity utilization performance")
-fig2 = go.Figure()
-for key, name, col in [
-    ("svc", "Service level", SERIES1_COLORS[0]),
-    ("gu", "Gross cap utilization", SERIES1_COLORS[1]),
-    ("nu", "Net cap utilization", SERIES1_COLORS[5]),
-]:
-    fig2.add_trace(
-        go.Scatter(x=df["day"], y=df[key] * 100, name=name, line=dict(color=col, width=1.3))
-    )
-fig2.update_layout(
-    height=300,
-    margin=dict(l=10, r=10, t=10, b=10),
-    yaxis=dict(ticksuffix="%"),
-    legend=dict(orientation="h"),
-    hovermode="x unified",
-)
-st.plotly_chart(fig2, use_container_width=True)
+chart2 = df.set_index("day")[["svc", "gu", "nu"]] * 100
+chart2.columns = ["Service level", "Gross cap utilization", "Net cap utilization"]
+st.line_chart(chart2, color=[SERIES1_COLORS[0], SERIES1_COLORS[1], SERIES1_COLORS[5]], height=320)
 
 # Summary statistics
 st.subheader("Summary statistics")
